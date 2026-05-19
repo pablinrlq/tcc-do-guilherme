@@ -1,0 +1,31 @@
+// ----- Typography helpers -----
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-bottom: var(--space-1);
+}
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  margin-bottom: var(--space-6);
+}
+.section-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: var(--space-6) 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.muted {
+  color: var(--text-muted);
+}
+.text-center {
+  text-align: center;
+}
+
