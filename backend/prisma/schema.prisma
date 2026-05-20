@@ -1,0 +1,416 @@
+// ============================================================================
+//  SkillEx — Schema do banco de dados (Prisma + SQLite)
+// ----------------------------------------------------------------------------
+//  Observação acadêmica: o SQLite (via Prisma) não suporta o tipo `enum`.
+//  Por isso, campos com valores fixos são modelados como `String` e seus
+//  valores permitidos estão documentados em comentários e validados no
+//  backend com Zod. Campos que armazenam listas (idiomas, tags, disponibilidade)
+//  são guardados como JSON em texto e convertidos no código.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+//  USUÁRIO — dados principais e autenticação
+// ----------------------------------------------------------------------------
+model User {
+  id           String  @id @default(cuid())
+  name         String
+  email        String  @unique
+  passwordHash String
+  role         String  @default("USER") // USER | ADMIN
+
+  avatarUrl String?
+  bio       String?
+  city      String?
+  state     String?
+
+  onboardingCompleted Boolean  @default(false)
+  lastActiveAt        DateTime @default(now())
+
+  // Conta ativa (false = desativada pelo admin ou excluída via LGPD)
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  profile          UserProfile?
+  wallet           Wallet?
+  teachingSkills   UserTeachingSkill[]
+  learningSkills   UserLearningSkill[]
+  sentRequests     ExchangeRequest[]   @relation("Requester")
+  receivedRequests ExchangeRequest[]   @relation("Recipient")
+  reviewsGiven     Review[]            @relation("ReviewAuthor")
+  reviewsReceived  Review[]            @relation("ReviewTarget")
+  notifications    Notification[]
+  favorites        Favorite[]          @relation("FavoriteOwner")
+  favoritedBy      Favorite[]          @relation("FavoriteTarget")
+  messages         ChatMessage[]
+  matchesAsA       Match[]             @relation("MatchUserA")
+  matchesAsB       Match[]             @relation("MatchUserB")
+  savedSkills         SavedSkill[]
+  passwordResetTokens PasswordResetToken[]
+  reportsSubmitted    Report[]             @relation("ReportsSubmitted")
+  reportsReceived     Report[]             @relation("ReportsReceived")
+  reportsResolved     Report[]             @relation("ReportsResolved")
+
+  @@map("users")
+}
+
+// ----------------------------------------------------------------------------
+//  TOKEN DE RECUPERAÇÃO DE SENHA — uso único, expira em 1 hora.
+//  Armazena apenas o hash (SHA-256) do token; o valor bruto é entregue ao
+//  usuário (em produção iria por e-mail; no MVP é exibido em ambiente dev).
+// ----------------------------------------------------------------------------
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("password_reset_tokens")
+}
+
+// ----------------------------------------------------------------------------
+//  PERFIL COMPLEMENTAR — preenchido no onboarding (relação 1:1 com User)
+// ----------------------------------------------------------------------------
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  gender            String? // MALE | FEMALE | OTHER | UNDISCLOSED
+  birthDate         DateTime?
+  nationality       String?
+  languages         String? // JSON: ["Português","Inglês"]
+  learningPrefs     String? // JSON: ["Prático","Teórico"]
+  availability      String? // JSON: ["MORNING","NIGHT","WEEKEND"]
+  preferredModality String? // ONLINE | IN_PERSON | BOTH
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+// ----------------------------------------------------------------------------
+//  CATEGORIA — agrupa habilidades (ex.: Música, Idiomas, Tecnologia)
+// ----------------------------------------------------------------------------
+model Category {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  slug   String  @unique
+  icon   String? // emoji ou nome de ícone
+  color  String? // cor de destaque (hex)
+  skills Skill[]
+
+  @@map("categories")
+}
+
+// ----------------------------------------------------------------------------
+//  HABILIDADE — catálogo global de habilidades
+// ----------------------------------------------------------------------------
+model Skill {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  slug       String   @unique
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  teachingLinks UserTeachingSkill[]
+  learningLinks UserLearningSkill[]
+  requestedIn   ExchangeRequest[]   @relation("RequestedSkill")
+  offeredIn     ExchangeRequest[]   @relation("OfferedSkill")
+  reviews       Review[]
+  savedBy       SavedSkill[]
+
+  @@map("skills")
+}
+
+// ----------------------------------------------------------------------------
+//  HABILIDADES QUE O USUÁRIO SABE ENSINAR
+// ----------------------------------------------------------------------------
+model UserTeachingSkill {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id])
+
+  level           String  // BEGINNER | INTERMEDIATE | ADVANCED | EXPERT
+  description     String?
+  experienceYears Int?
+  modality        String  @default("BOTH") // ONLINE | IN_PERSON | BOTH
+  acceptsCoins    Boolean @default(true)
+  acceptsExchange Boolean @default(true)
+  coinPrice       Int?    // valor em SkillCoins por aula
+  availability    String? // JSON
+  tags            String? // JSON: ["clássico","iniciantes"]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, skillId])
+  @@map("user_teaching_skills")
+}
+
+// ----------------------------------------------------------------------------
+//  HABILIDADES QUE O USUÁRIO DESEJA APRENDER
+// ----------------------------------------------------------------------------
+model UserLearningSkill {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id])
+
+  currentLevel        String  @default("NONE") // NONE | BEGINNER | INTERMEDIATE | ADVANCED
+  goal                String?
+  preferredGender     String? // MALE | FEMALE | OTHER | ANY
+  preferredNationality String?
+  preferredLanguage   String?
+  preferredAgeRange   String? // ex.: "18-30"
+  modality            String  @default("BOTH") // ONLINE | IN_PERSON | BOTH
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, skillId])
+  @@map("user_learning_skills")
+}
+
+// ----------------------------------------------------------------------------
+//  MATCH — registro/cache da compatibilidade calculada entre dois usuários
+// ----------------------------------------------------------------------------
+model Match {
+  id      String @id @default(cuid())
+  userAId String
+  userA   User   @relation("MatchUserA", fields: [userAId], references: [id])
+  userBId String
+  userB   User   @relation("MatchUserB", fields: [userBId], references: [id])
+
+  score Float  // 0–100
+  type  String // PERFECT | PARTIAL | COIN_ONLY
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userAId, userBId])
+  @@map("matches")
+}
+
+// ----------------------------------------------------------------------------
+//  SOLICITAÇÃO DE TROCA OU AULA
+// ----------------------------------------------------------------------------
+model ExchangeRequest {
+  id          String @id @default(cuid())
+  requesterId String
+  requester   User   @relation("Requester", fields: [requesterId], references: [id])
+  recipientId String
+  recipient   User   @relation("Recipient", fields: [recipientId], references: [id])
+
+  requestedSkillId String
+  requestedSkill   Skill   @relation("RequestedSkill", fields: [requestedSkillId], references: [id])
+  offeredSkillId   String?
+  offeredSkill     Skill?  @relation("OfferedSkill", fields: [offeredSkillId], references: [id])
+
+  type          String  @default("EXCHANGE") // EXCHANGE | COIN
+  status        String  @default("PENDING")  // PENDING | ACCEPTED | REJECTED | CANCELLED | COMPLETED
+  coinAmount    Int?    // moedas envolvidas (quando type = COIN)
+  message       String?
+  suggestedDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews  Review[]
+  messages ChatMessage[]
+  events   ExchangeRequestEvent[]
+  reports  Report[]
+
+  @@map("exchange_requests")
+}
+
+// ----------------------------------------------------------------------------
+//  HISTÓRICO DE STATUS DA SOLICITAÇÃO
+// ----------------------------------------------------------------------------
+model ExchangeRequestEvent {
+  id        String          @id @default(cuid())
+  requestId String
+  request   ExchangeRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  status    String
+  note      String?
+  createdAt DateTime        @default(now())
+
+  @@map("exchange_request_events")
+}
+
+// ----------------------------------------------------------------------------
+//  CARTEIRA — saldo de moedas internas (SkillCoins)
+// ----------------------------------------------------------------------------
+model Wallet {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  balance       Int @default(0) // saldo disponível
+  lockedBalance Int @default(0) // saldo bloqueado até confirmação da aula
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions CoinTransaction[]
+
+  @@map("wallets")
+}
+
+// ----------------------------------------------------------------------------
+//  TRANSAÇÃO DE MOEDAS — histórico financeiro
+// ----------------------------------------------------------------------------
+model CoinTransaction {
+  id       String @id @default(cuid())
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  amount           Int     // positivo = crédito, negativo = débito
+  type             String  // PURCHASE | EARNING | SPEND | LOCK | UNLOCK | REFUND | BONUS
+  description      String?
+  relatedRequestId String?
+  balanceAfter     Int
+
+  createdAt DateTime @default(now())
+
+  @@map("coin_transactions")
+}
+
+// ----------------------------------------------------------------------------
+//  AVALIAÇÃO — reputação após troca/aula concluída
+// ----------------------------------------------------------------------------
+model Review {
+  id        String          @id @default(cuid())
+  requestId String
+  request   ExchangeRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetId String
+  target   User   @relation("ReviewTarget", fields: [targetId], references: [id])
+  skillId  String
+  skill    Skill  @relation(fields: [skillId], references: [id])
+
+  rating  Int     // 1–5
+  comment String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([requestId, authorId])
+  @@map("reviews")
+}
+
+// ----------------------------------------------------------------------------
+//  NOTIFICAÇÃO — avisos internos
+// ----------------------------------------------------------------------------
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type    String  // REQUEST_RECEIVED | REQUEST_ACCEPTED | REQUEST_REJECTED | REQUEST_COMPLETED | NEW_MESSAGE | NEW_MATCH | REVIEW_RECEIVED | COINS_RECEIVED
+  title   String
+  message String
+  link    String?
+  read    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+// ----------------------------------------------------------------------------
+//  FAVORITO — usuário salva outro usuário de interesse
+// ----------------------------------------------------------------------------
+model Favorite {
+  id              String @id @default(cuid())
+  userId          String
+  user            User   @relation("FavoriteOwner", fields: [userId], references: [id], onDelete: Cascade)
+  favoriteUserId  String
+  favoriteUser    User   @relation("FavoriteTarget", fields: [favoriteUserId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, favoriteUserId])
+  @@map("favorites")
+}
+
+// ----------------------------------------------------------------------------
+//  HABILIDADE SALVA — usuário marca uma habilidade de interesse (bookmark)
+// ----------------------------------------------------------------------------
+model SavedSkill {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, skillId])
+  @@map("saved_skills")
+}
+
+// ----------------------------------------------------------------------------
+//  DENÚNCIA — relato de comportamento inadequado
+//  type:   INAPPROPRIATE_CONTENT | HARASSMENT | SCAM | FAKE_PROFILE | SPAM | OTHER
+//  status: PENDING | UNDER_REVIEW | RESOLVED | DISMISSED
+// ----------------------------------------------------------------------------
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  reporter    User     @relation("ReportsSubmitted", fields: [reporterId], references: [id])
+  targetId    String?
+  target      User?    @relation("ReportsReceived", fields: [targetId], references: [id])
+  requestId   String?
+  request     ExchangeRequest? @relation(fields: [requestId], references: [id])
+
+  type         String  // INAPPROPRIATE_CONTENT | HARASSMENT | SCAM | FAKE_PROFILE | SPAM | OTHER
+  description  String
+  status       String  @default("PENDING") // PENDING | UNDER_REVIEW | RESOLVED | DISMISSED
+  adminNote    String?
+  resolvedById String?
+  resolvedBy   User?   @relation("ReportsResolved", fields: [resolvedById], references: [id])
+  resolvedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reports")
+}
+
+// ----------------------------------------------------------------------------
+//  MENSAGEM DE CHAT — vinculada a uma solicitação/match
+// ----------------------------------------------------------------------------
+model ChatMessage {
+  id        String          @id @default(cuid())
+  requestId String
+  request   ExchangeRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User            @relation(fields: [senderId], references: [id])
+
+  content String
+  read    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("chat_messages")
+}
