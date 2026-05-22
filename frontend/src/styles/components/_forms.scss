@@ -1,0 +1,77 @@
+// ----- Forms -----
+.field {
+  margin-bottom: var(--space-4);
+}
+.field__label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-2);
+  color: var(--text);
+}
+.input,
+.textarea,
+.select {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 13px 15px;
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &::placeholder {
+    color: var(--text-soft);
+  }
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-tint);
+  }
+}
+.textarea {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.5;
+}
+.field__hint {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  margin-top: var(--space-2);
+}
+.field__error {
+  font-size: 0.8rem;
+  color: var(--danger);
+  margin-top: var(--space-2);
+}
+
+// Chips selecionáveis (multi-escolha)
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  padding: 9px 15px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  border: 1.5px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  user-select: none;
+
+  &:hover {
+    border-color: var(--border);
+  }
+  &.selected {
+    background: var(--color-primary-tint);
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+  }
+}
+
