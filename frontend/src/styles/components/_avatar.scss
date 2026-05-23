@@ -1,0 +1,29 @@
+// ----- Avatar -----
+.avatar {
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: var(--surface-2);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--text-muted);
+  overflow: hidden;
+
+  &--sm {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+  &--md {
+    width: 56px;
+    height: 56px;
+    font-size: 1.1rem;
+  }
+  &--lg {
+    width: 92px;
+    height: 92px;
+    font-size: 2rem;
+  }
+}
+
