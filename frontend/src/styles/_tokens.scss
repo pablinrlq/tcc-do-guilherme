@@ -1,0 +1,78 @@
+// ----- Tokens (CSS Custom Properties) -----
+:root {
+  --color-primary: #f97316;
+  --color-primary-dark: #ea580c;
+  --color-primary-light: #fb923c;
+  --color-primary-tint: #fff7ed;
+  --on-primary: #ffffff;
+
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --surface-2: #f3f4f6;
+  --surface-3: #e9ebef;
+  --border: #e5e7eb;
+
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --text-soft: #9ca3af;
+
+  --success: #22c55e;
+  --success-tint: #dcfce7;
+  --danger: #ef4444;
+  --danger-tint: #fee2e2;
+  --warning: #f59e0b;
+  --warning-tint: #fef3c7;
+  --info: #0ea5e9;
+  --info-tint: #e0f2fe;
+
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow: 0 4px 16px rgba(17, 24, 39, 0.08);
+  --shadow-lg: 0 12px 32px rgba(17, 24, 39, 0.14);
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  // Escala de espaçamento (base 4px) — usada para padding, margin e gap
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  --header-h: 60px;
+  --nav-h: 68px;
+  --maxw: 600px;
+  --sidebar-w: 248px;
+  --content-maxw: 760px;
+
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+[data-theme='dark'] {
+  --bg: #0b0f14;
+  --surface: #151b23;
+  --surface-2: #1e2630;
+  --surface-3: #283039;
+  --border: #2a323d;
+  --color-primary-tint: #2a1a0e;
+
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-soft: #6b7280;
+
+  --success-tint: #14321f;
+  --danger-tint: #3a1717;
+  --warning-tint: #3a2c0e;
+  --info-tint: #0c2733;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+

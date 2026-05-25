@@ -1,0 +1,42 @@
+# Dependências
+node_modules/
+
+# Builds
+dist/
+build/
+
+# Banco de dados SQLite
+*.db
+*.db-journal
+*.sqlite
+
+# Variáveis de ambiente
+.env
+
+# Uploads de usuários
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cobertura de testes
+coverage/
+**/coverage/
+
+# Playwright (E2E)
+test-results/
+e2e/report/
+playwright-report/
+blob-report/
+.last-run.json
+
+# Sistema operacional / Editor
+.DS_Store
+Thumbs.db
+!.vscode/extensions.json
+.idea/
+
+# Configuração local de agentes de código
+.claude/

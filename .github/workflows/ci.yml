@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  # ── Backend: testes unitários + integração com gate de cobertura 100% ──────
+  backend:
+    name: Backend (unit + integração)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar dependências
+        run: npm install
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+      - name: Testes com cobertura (gate 100%)
+        run: npm run test:cov
+      - name: Publicar relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage
+          if-no-files-found: ignore
+
+  # ── Frontend: testes da camada de lógica + componentes (gate 100%) ─────────
+  frontend:
+    name: Frontend (unit + componentes)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar dependências
+        run: npm install
+      - name: Testes com cobertura (gate 100%)
+        run: npm run test:cov
+      - name: Publicar relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          if-no-files-found: ignore
+
+  # ── E2E: Playwright contra a stack real (backend semeado + frontend) ───────
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependências do backend
+        working-directory: backend
+        run: npm install
+      - name: Gerar Prisma Client
+        working-directory: backend
+        run: npx prisma generate
+
+      - name: Instalar dependências do frontend
+        working-directory: frontend
+        run: npm install
+
+      - name: Instalar dependências do E2E (raiz)
+        run: npm install
+      - name: Instalar navegadores Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Rodar testes E2E
+        run: npm run test:e2e
+
+      - name: Publicar relatório do Playwright
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/report
+          if-no-files-found: ignore
