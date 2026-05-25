@@ -1,0 +1,204 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ============================================================================
+    // Backend Tasks
+    // ============================================================================
+    {
+      "label": "Backend: Dev Server",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/backend", "run", "dev"],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*starting.*",
+          "endsPattern": "^.*listening.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "echo": true
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Backend: Setup DB",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/backend", "run", "db:setup"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Type-Check",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/backend", "exec", "tsc", "--", "--noEmit"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Backend: Build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/backend", "run", "build"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    // ============================================================================
+    // Frontend Tasks
+    // ============================================================================
+    {
+      "label": "Frontend: Dev Server",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/frontend", "run", "dev"],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*local:.*",
+          "endsPattern": "^.*ready in.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "echo": true
+      }
+    },
+    {
+      "label": "Frontend: Type-Check",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/frontend", "exec", "tsc", "--", "--noEmit"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Frontend: Build",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/frontend", "run", "build"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    // ============================================================================
+    // Full Stack Tasks
+    // ============================================================================
+    {
+      "label": "🚀 Dev: Backend + Frontend",
+      "dependsOn": [
+        "Backend: Dev Server",
+        "Frontend: Dev Server"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "🚀 Setup: Database + Install",
+      "type": "shell",
+      "command": "npm",
+      "args": ["--prefix", "${workspaceFolder}/backend", "run", "db:setup"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "dependsOn": []
+    },
+    {
+      "label": "📦 Check: Types (Frontend + Backend)",
+      "dependsOn": [
+        "Frontend: Type-Check",
+        "Backend: Type-Check"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "🔨 Build: Frontend + Backend",
+      "dependsOn": [
+        "Frontend: Build",
+        "Backend: Build"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      }
+    },
+    // ============================================================================
+    // Utility Tasks
+    // ============================================================================
+    {
+      "label": "npm: Install All Dependencies",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "npm --prefix ${workspaceFolder}/backend install; npm --prefix ${workspaceFolder}/frontend install"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: DB Reset",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "cd ${workspaceFolder}/backend; npm run db:reset"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

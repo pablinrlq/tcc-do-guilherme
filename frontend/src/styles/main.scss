@@ -1,0 +1,34 @@
+// ============================================================================
+//  SkillEx — Design System (SCSS)
+//  Mobile-first · Flat design · Paleta laranja · Tema claro/escuro
+//
+//  Agregador: cada parte vive em um partial próprio. A ordem dos @use abaixo
+//  preserva a cascata do arquivo original — não reordenar.
+// ============================================================================
+
+@use 'tokens';
+@use 'base';
+@use 'components/shell';
+@use 'typography';
+@use 'components/buttons';
+@use 'components/forms';
+@use 'components/password';
+@use 'components/cards';
+@use 'components/avatar';
+@use 'components/badges';
+@use 'components/user-card';
+@use 'components/rating';
+@use 'components/tabs';
+@use 'pages/profile';
+@use 'pages/wallet';
+@use 'pages/requests';
+@use 'pages/ranking';
+@use 'components/chat';
+@use 'pages/auth-onboarding';
+@use 'components/toast';
+@use 'components/sheet';
+@use 'components/states';
+@use 'utilities';
+@use 'animations';
+@use 'pages/landing';
+@use 'pages/legal';
