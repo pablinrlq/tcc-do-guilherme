@@ -1,0 +1,12 @@
+// ----- Rating (estrelas) -----
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  color: #fbbf24;
+  font-size: 0.9rem;
+  &--input span {
+    cursor: pointer;
+    font-size: 1.8rem;
+  }
+}
+
