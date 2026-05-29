@@ -1,0 +1,29 @@
+// ----- Tabs / Segmented -----
+.segmented {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  padding: 5px;
+  gap: 5px;
+  margin-bottom: var(--space-5);
+  overflow-x: auto;
+
+  button {
+    flex: 1;
+    white-space: nowrap;
+    padding: 10px 14px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.86rem;
+    letter-spacing: -0.01em;
+    color: var(--text-muted);
+    transition: all 0.15s;
+
+    &.active {
+      background: var(--surface);
+      color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+

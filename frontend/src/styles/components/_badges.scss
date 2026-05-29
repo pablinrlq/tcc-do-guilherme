@@ -1,0 +1,83 @@
+// ----- Badges -----
+.skill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-muted);
+
+  .bi {
+    font-size: 0.9em;
+    opacity: 0.85;
+  }
+
+  &--teach {
+    background: var(--color-primary-tint);
+    color: var(--color-primary-dark);
+  }
+  &--learn {
+    background: var(--info-tint);
+    color: var(--info);
+  }
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// Selo de match
+.match-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+
+  &--perfect {
+    background: var(--success-tint);
+    color: var(--success);
+  }
+  &--partial {
+    background: var(--warning-tint);
+    color: var(--warning);
+  }
+  &--coin {
+    background: var(--info-tint);
+    color: var(--info);
+  }
+}
+
+// Anel de pontuação de compatibilidade
+.score-ring {
+  --val: 0;
+  --ring: var(--success);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: conic-gradient(var(--ring) calc(var(--val) * 1%), var(--surface-2) 0);
+
+  span {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+}
+
