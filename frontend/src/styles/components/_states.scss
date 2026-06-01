@@ -1,0 +1,48 @@
+// ----- States: skeleton / empty / loading -----
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--surface-3) 37%,
+    var(--surface-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius);
+}
+.skeleton-card {
+  height: 150px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-10) var(--space-5);
+  color: var(--text-muted);
+
+  &__icon {
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--text-soft);
+    margin-bottom: var(--space-3);
+  }
+  &__title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: var(--space-1);
+  }
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--surface-3);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 0.7s linear infinite;
+  margin: 32px auto;
+}
+
