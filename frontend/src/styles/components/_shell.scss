@@ -1,0 +1,236 @@
+// ----- App Shell / Layout -----
+#app {
+  min-height: 100%;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.app-header__inner {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 var(--space-4);
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+
+.app-header__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: #fff;
+    font-size: 1.05rem;
+  }
+  .logo-text span {
+    color: var(--color-primary);
+  }
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+
+  &:hover,
+  &:active {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+}
+
+.badge-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--surface);
+}
+
+.app-content {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) calc(var(--nav-h) + var(--space-8));
+  animation: fade-in 0.25s ease;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav__inner {
+  display: flex;
+  height: var(--nav-h);
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-soft);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  transition: color 0.15s;
+
+  .nav-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  &.active {
+    color: var(--color-primary);
+  }
+  &.nav-fab {
+    .nav-icon {
+      width: 48px;
+      height: 48px;
+      margin-top: -20px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
+      font-size: 1.5rem;
+    }
+    color: var(--color-primary);
+  }
+}
+
+// ----- Desktop (>= 1024px): header de largura total + navegação lateral -----
+// O layout mobile permanece intacto; aqui só melhoramos a versão desktop:
+// a barra inferior vira uma sidebar vertical fixa e o conteúdo ganha respiro.
+@media (min-width: 1024px) {
+  .app-header__inner {
+    max-width: none;
+    padding: 0 var(--space-6);
+  }
+
+  .bottom-nav {
+    top: var(--header-h);
+    right: auto;
+    width: var(--sidebar-w);
+    border-top: none;
+    border-right: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+  .bottom-nav__inner {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--space-1);
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: var(--space-5) var(--space-3) var(--space-6);
+    overflow-y: auto;
+  }
+  .nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+
+    .nav-icon {
+      font-size: 1.3rem;
+    }
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    &.active {
+      background: var(--color-primary-tint);
+      color: var(--color-primary);
+    }
+    // No desktop o item central deixa de ser um "FAB" elevado e vira item normal
+    &.nav-fab {
+      color: var(--color-primary);
+
+      .nav-icon {
+        width: auto;
+        height: auto;
+        margin-top: 0;
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+        color: inherit;
+        font-size: 1.3rem;
+      }
+    }
+  }
+
+  // Conteúdo deslocado para a direita da sidebar e centralizado numa coluna
+  .app-content {
+    margin-left: var(--sidebar-w);
+    max-width: none;
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-10);
+    padding-left: max(var(--space-8), calc((100% - var(--sidebar-w) - var(--content-maxw)) / 2));
+    padding-right: max(var(--space-8), calc((100% - var(--sidebar-w) - var(--content-maxw)) / 2));
+  }
+
+  // Toasts centralizados sobre o conteúdo (compensando a sidebar à esquerda)
+  .toast-wrap {
+    left: calc(50% + (var(--sidebar-w) / 2));
+    bottom: var(--space-6);
+  }
+}
+
