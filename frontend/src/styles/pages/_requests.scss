@@ -1,0 +1,31 @@
+// ----- Requests -----
+.request-item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-2);
+  transition: box-shadow 0.15s, border-color 0.15s;
+  &:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--surface-3);
+  }
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+  &__title {
+    font-weight: 600;
+    font-size: 0.94rem;
+    letter-spacing: -0.01em;
+  }
+  &__sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+}
+
