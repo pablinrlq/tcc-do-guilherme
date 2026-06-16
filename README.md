@@ -90,6 +90,23 @@ Outros comandos do script:
 > No Windows, rode o script pelo **Git Bash** ou **WSL**. Ajustes de produção
 > (JWT_SECRET, CLIENT_URL, desligar o seed) ficam no arquivo `.env` da raiz.
 
+### ☁️ Deploy numa instância EC2 (Amazon Linux 2023)
+
+Numa instância **recém-criada**, o script [`setup-aws.sh`](setup-aws.sh) faz tudo
+sozinho: atualiza o sistema, instala **git + Docker + Docker Compose**, clona o
+repositório e sobe a aplicação.
+
+```bash
+# conecte via SSH na instância e rode:
+curl -fsSL https://raw.githubusercontent.com/pablinrlq/tcc-do-guilherme/main/setup-aws.sh -o setup-aws.sh
+sudo bash setup-aws.sh
+```
+
+> Também dá para colar o conteúdo do `setup-aws.sh` no campo **"User data"** ao
+> criar a instância — aí ele roda automaticamente no primeiro boot.
+
+Lembre de **liberar as portas 80 e 3333 (TCP)** no *Security Group* da instância.
+
 ## ✨ Funcionalidades
 
 - Cadastro, login e autenticação segura (JWT + bcrypt)
