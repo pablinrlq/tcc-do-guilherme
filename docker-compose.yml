@@ -28,7 +28,9 @@ services:
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-5}
       # URL do frontend (usada no header CORS)
-      CLIENT_URL: http://localhost
+      CLIENT_URL: ${CLIENT_URL:-http://localhost}
+      # Popula dados de demonstração no 1º start (true/false)
+      SEED_ON_START: ${SEED_ON_START:-true}
     volumes:
       - skillex_data:/app/data
       - skillex_uploads:/app/uploads

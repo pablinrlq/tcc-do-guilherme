@@ -54,6 +54,42 @@ npm run dev          # App em http://localhost:5173
 
 > Instruções completas de instalação, contas de teste e detalhes de cada módulo estão em [`docs/`](docs/).
 
+## 🐳 Deploy com Docker
+
+A forma mais simples de subir tudo (frontend + backend + banco) é via Docker.
+
+```bash
+# 1. (uma vez) dê permissão de execução ao script
+chmod +x deploy.sh
+
+# 2. build + sobe em segundo plano (cria o .env e gera o JWT_SECRET sozinho)
+./deploy.sh
+```
+
+Depois disso a aplicação fica disponível em:
+
+| Serviço | URL |
+|---------|-----|
+| App (frontend) | http://localhost |
+| API | http://localhost:3333 |
+| Healthcheck | http://localhost:3333/health |
+| Swagger | http://localhost:3333/api-docs |
+
+Conta de teste (criada quando `SEED_ON_START=true`): **ana@skillex.com / senha123**.
+
+Outros comandos do script:
+
+```bash
+./deploy.sh logs      # acompanha os logs
+./deploy.sh status    # estado dos containers
+./deploy.sh down      # para (mantém o banco e os uploads)
+./deploy.sh reset     # para e APAGA os volumes (zera o banco)
+./deploy.sh rebuild   # rebuild sem cache
+```
+
+> No Windows, rode o script pelo **Git Bash** ou **WSL**. Ajustes de produção
+> (JWT_SECRET, CLIENT_URL, desligar o seed) ficam no arquivo `.env` da raiz.
+
 ## ✨ Funcionalidades
 
 - Cadastro, login e autenticação segura (JWT + bcrypt)

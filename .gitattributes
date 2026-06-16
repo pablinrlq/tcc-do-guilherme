@@ -1,0 +1,4 @@
+# Garante que scripts de shell sempre usem fim de linha LF,
+# mesmo quando clonados/editados no Windows (CRLF quebra o sh no container).
+*.sh text eol=lf
+docker-entrypoint.sh text eol=lf
