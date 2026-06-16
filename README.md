@@ -37,36 +37,6 @@ habilidade compatível pode pagar a aula com a **moeda interna (SkillCoins)**.
 | `frontend/` | Aplicação SPA (React + Vite + TypeScript + SCSS) |
 | `docs/`     | Documentação técnica e acadêmica do TCC |
 
-## 🚀 Como rodar (resumo)
-
-```bash
-# 1. Backend
-cd backend
-npm install
-npm run db:setup     # cria banco, aplica migrations e popula com dados fictícios
-npm run dev          # API em http://localhost:3333
-
-# 2. Frontend (em outro terminal)
-cd frontend
-npm install
-npm run dev          # App em http://localhost:5173
-```
-
-> Instruções completas de instalação, contas de teste e detalhes de cada módulo estão em [`docs/`](docs/).
-
-## 🐳 Deploy com Docker
-
-A forma mais simples de subir tudo (frontend + backend + banco) é via Docker.
-
-```bash
-# 1. (uma vez) dê permissão de execução ao script
-chmod +x deploy.sh
-
-# 2. build + sobe em segundo plano (cria o .env e gera o JWT_SECRET sozinho)
-./deploy.sh
-```
-
-Depois disso a aplicação fica disponível em:
 
 | Serviço | URL |
 |---------|-----|
@@ -74,27 +44,6 @@ Depois disso a aplicação fica disponível em:
 | API | http://localhost:3333 |
 | Healthcheck | http://localhost:3333/health |
 | Swagger | http://localhost:3333/api-docs |
-
-Conta de teste (criada quando `SEED_ON_START=true`): **ana@skillex.com / senha123**.
-
-Outros comandos do script:
-
-```bash
-./deploy.sh logs      # acompanha os logs
-./deploy.sh status    # estado dos containers
-./deploy.sh down      # para (mantém o banco e os uploads)
-./deploy.sh reset     # para e APAGA os volumes (zera o banco)
-./deploy.sh rebuild   # rebuild sem cache
-```
-
-> No Windows, rode o script pelo **Git Bash** ou **WSL**. Ajustes de produção
-> (JWT_SECRET, CLIENT_URL, desligar o seed) ficam no arquivo `.env` da raiz.
-
-### ☁️ Deploy numa instância EC2 (Amazon Linux 2023)
-
-Numa instância **recém-criada**, o script [`setup-aws.sh`](setup-aws.sh) faz tudo
-sozinho: atualiza o sistema, instala **git + Docker + Docker Compose**, clona o
-repositório e sobe a aplicação.
 
 ```bash
 # conecte via SSH na instância e rode:
