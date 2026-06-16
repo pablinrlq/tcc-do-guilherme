@@ -54,6 +54,41 @@ systemctl enable --now docker
 # Permite que o ec2-user use docker sem sudo (vale após reconectar via SSH)
 usermod -aG docker "$APP_USER" 2>/dev/null || true
 
+# ─── 3b. Garante o plugin Docker Buildx >= 0.17.0 ─────────────────────────────
+# O 'docker compose build' (Compose v2) exige buildx >= 0.17.0. O pacote 'docker'
+# do Amazon Linux 2023 pode trazer um buildx ANTIGO (ex.: 0.12.1) ou nenhum, o
+# que faz o build falhar com: "compose build requires buildx 0.17.0 or later".
+# Aqui checamos a VERSÃO (não só a existência) e instalamos um novo se preciso.
+BUILDX_MIN="0.17.0"
+buildx_ok=0
+if docker buildx version >/dev/null 2>&1; then
+  CUR_BUILDX="$(docker buildx version | grep -oP 'v?\K[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || true)"
+  if [ -n "$CUR_BUILDX" ] && \
+     [ "$(printf '%s\n%s\n' "$BUILDX_MIN" "$CUR_BUILDX" | sort -V | head -n1)" = "$BUILDX_MIN" ]; then
+    buildx_ok=1
+    log "Docker Buildx já atende ($CUR_BUILDX >= $BUILDX_MIN)."
+  fi
+fi
+
+if [ "$buildx_ok" -ne 1 ]; then
+  log "Instalando/atualizando o plugin Docker Buildx (atual: ${CUR_BUILDX:-nenhum})..."
+  case "$(uname -m)" in
+    x86_64)  BUILDX_ARCH="amd64" ;;
+    aarch64) BUILDX_ARCH="arm64" ;;
+    *)       BUILDX_ARCH="amd64" ;;
+  esac
+  BUILDX_VERSION="$(curl -fsSL https://api.github.com/repos/docker/buildx/releases/latest \
+    | grep -oP '"tag_name":\s*"\K[^"]+' || true)"
+  [ -z "$BUILDX_VERSION" ] && BUILDX_VERSION="v0.17.1"   # fallback (>= 0.17.0)
+
+  mkdir -p /usr/local/lib/docker/cli-plugins
+  curl -fsSL \
+    "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${BUILDX_ARCH}" \
+    -o /usr/local/lib/docker/cli-plugins/docker-buildx
+  chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+  log "Docker Buildx ${BUILDX_VERSION} instalado ($(docker buildx version | head -n1))."
+fi
+
 # ─── 4. Garante o Docker Compose v2 (plugin) ──────────────────────────────────
 if docker compose version >/dev/null 2>&1; then
   log "Docker Compose já disponível ($(docker compose version | head -n1))."
