@@ -1,0 +1,61 @@
+# =============================================================================
+#  SkillEx — Docker Compose
+# =============================================================================
+#  Uso rápido:
+#    cp .env.docker .env          # ajuste JWT_SECRET antes de subir em produção
+#    docker compose up --build    # build + start
+#    docker compose up -d         # start em segundo plano
+#    docker compose down -v       # encerra e remove volumes (apaga dados!)
+# =============================================================================
+
+services:
+
+  # ─── Backend (API Express + Prisma + SQLite) ───────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Banco SQLite persistido no volume skillex_data
+      DATABASE_URL: file:/app/data/skillex.db
+      # Segredo JWT — sobrescreva com variável de ambiente ou arquivo .env
+      JWT_SECRET: ${JWT_SECRET:-skillex-docker-secret-CHANGE-ME}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      PORT: 3333
+      # Uploads persistidos no volume skillex_uploads
+      UPLOAD_DIR: /app/uploads
+      MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-5}
+      # URL do frontend (usada no header CORS)
+      CLIENT_URL: http://localhost
+    volumes:
+      - skillex_data:/app/data
+      - skillex_uploads:/app/uploads
+    ports:
+      - "3333:3333"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3333/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── Frontend (Vite build → nginx) ────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+# ─── Volumes persistentes ─────────────────────────────────────────────────────
+volumes:
+  skillex_data:
+    driver: local
+  skillex_uploads:
+    driver: local
